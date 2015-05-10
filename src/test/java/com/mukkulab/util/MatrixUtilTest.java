@@ -14,7 +14,6 @@ public class MatrixUtilTest {
     // TODO: variance check
     @Test
     public void randomGaussianRandomTest() {
-        boolean success = false;
         Random random = new Random();
         Matrix x = MatrixUtils.randomGaussian(1000, 1000, random);
         int n = 0;

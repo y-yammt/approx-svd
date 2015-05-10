@@ -6,6 +6,9 @@ import com.mukkulab.ApproxLinearAlgebra;
 import org.junit.Test;
 import org.la4j.Matrix;
 import org.la4j.matrix.dense.Basic2DMatrix;
+import org.la4j.matrix.sparse.CCSMatrix;
+
+import java.util.Random;
 
 public class RedSVDTest {
     private static final double EPS = 0.001;
@@ -51,6 +54,32 @@ public class RedSVDTest {
         for (int i = 0; i < x.rows(); ++i) {
             for (int j = 0; j < x.columns(); ++j) {
                 assertEquals(x.get(i, j), c.get(i, j), EPS);
+            }
+        }
+    }
+
+    @Test
+    public void redSvdRandomTest() {
+        Random random = new Random();
+        ApproxLinearAlgebra.DecompositorFactory redSvdFactory = ApproxLinearAlgebra.DecompositorFactory.REDSVD;
+
+        int row = 10000;
+        int col = 10000;
+        Matrix sparseMatrix = new CCSMatrix(row, col);
+
+        for (int i = 0; i < row; i += random.nextInt(1000)) {
+            for (int j = 0; j < row; j += random.nextInt(1000)) {
+                sparseMatrix.set(i, j, random.nextInt(10));
+            }
+        }
+        RedSVD redSvdComp = (RedSVD)redSvdFactory.create(sparseMatrix);
+        Matrix[] svd = redSvdComp.decompose(100);
+
+        // Check composition matrix.
+        Matrix c = svd[0].multiply(svd[1]).multiply(svd[2].transpose());
+        for (int i = 0; i < sparseMatrix.rows(); ++i) {
+            for (int j = 0; j < sparseMatrix.columns(); ++j) {
+                assertEquals(sparseMatrix.get(i, j), c.get(i, j), EPS);
             }
         }
     }
